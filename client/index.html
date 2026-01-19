@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Folder Bulk Operations</title>
+  <link rel="stylesheet" href="/src/styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>📁 Folder Bulk Operations</h1>
+      <p>Load a folder and validate it against a server path</p>
+    </header>
+
+    <main class="main-content">
+      <!-- Absolute Path Input -->
+      <section class="input-section">
+        <label for="absolutePath" class="label">
+          <span class="label-text">Absolute Path (Server)</span>
+          <span class="label-hint">Enter the absolute path on the server to validate against</span>
+        </label>
+        <div class="input-with-action">
+          <input 
+            type="text" 
+            id="absolutePath" 
+            class="input" 
+            placeholder="/path/to/folder"
+          />
+          <button type="button" class="btn btn-icon" id="resetBtn" title="Reset">
+            🔄
+          </button>
+        </div>
+      </section>
+
+      <!-- Folder Input -->
+      <section class="input-section">
+        <label for="folderInput" class="label">
+          <span class="label-text">Load Local Folder</span>
+          <span class="label-hint">Select a folder from your computer to upload</span>
+        </label>
+        <div class="folder-input-wrapper">
+          <input 
+            type="file" 
+            id="folderInput" 
+            webkitdirectory 
+            directory 
+            multiple
+            class="folder-input"
+          />
+          <button type="button" class="btn btn-secondary" id="selectFolderBtn">
+            📂 Select Folder
+          </button>
+          <span id="selectedFolderName" class="selected-folder-name"></span>
+        </div>
+      </section>
+
+      <!-- Folder Preview -->
+      <section class="preview-section" id="previewSection" style="display: none;">
+        <div class="preview-header">
+          <h2>📋 Folder Preview</h2>
+          <div class="preview-stats" id="previewStats"></div>
+        </div>
+        <div class="folder-tree" id="folderTree"></div>
+      </section>
+    </main>
+
+    <!-- Fixed Footer -->
+    <footer class="footer">
+      <button type="button" class="btn btn-primary" id="startChangesBtn" disabled>
+        🚀 Start Changes
+      </button>
+      <button type="button" class="btn btn-success" id="submitChangesBtn" disabled style="display: none;">
+        📤 Submit Changes
+      </button>
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay" style="display: none;">
+      <div class="modal">
+        <div class="modal-content" id="modalContent">
+          <!-- Dynamic content will be inserted here -->
+        </div>
+        <button type="button" class="btn btn-secondary modal-close" id="modalCloseBtn" style="display: none;">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

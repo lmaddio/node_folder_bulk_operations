@@ -1,99 +1,113 @@
-# Folder Validator - Fullstack Application
+# Folder Bulk Operations
 
-A fullstack application with a Node.js backend and React.js frontend for validating folder contents.
+A fullstack application built with Node.js (Express) and Vite that allows users to validate folder structures against server paths.
 
 ## Features
 
-### Frontend (React.js)
-1. **Absolute Path Input** - Set the absolute path to a folder for validation
-2. **Folder Selection** - Select a folder using the browser's folder picker to get directory information
-3. **File Information Display** - Shows file/folder name, size, type, and last modified date
-4. **Submit Form** - Send folder data to the backend for validation
-5. **Modal with Loading Spinner** - Shows loading state during validation, then displays success or error messages
+### Frontend (Vite)
+- 📁 Input field for absolute server path
+- 📂 Local folder selection using browser's file picker
+- 👀 Preview of folder structure with:
+  - File/folder names
+  - File and directory sizes
+  - Last modification dates
+- 🚀 Fixed footer with "Start Changes" button
+- 💫 Modal with spinner for loading states
+- ✅ Success/error feedback display
 
-### Backend (Node.js + Express)
-- Validates the absolute path is valid and points to an existing folder
-- Checks read permissions on the folder
-- Validates all items from the frontend exist in the specified folder
-- Returns detailed error messages if validation fails
+### Backend (Express)
+- 🔍 Endpoint to validate folder structures
+- ✔️ Checks if absolute path is accessible on server
+- 🔄 Compares client-side folder structure with server-side
+- 📊 Returns detailed mismatch information if structures don't match
 
 ## Project Structure
 
 ```
-new-project-eval/
-├── backend/
-│   ├── package.json
-│   └── server.js
-├── frontend/
+node_folder_bulk_operations/
+├── package.json           # Root package.json with scripts
+├── README.md
+├── client/                # Vite frontend
 │   ├── package.json
 │   ├── vite.config.js
 │   ├── index.html
 │   └── src/
-│       ├── main.jsx
-│       ├── App.jsx
-│       ├── index.css
-│       └── components/
-│           └── Modal.jsx
-└── README.md
+│       ├── main.js        # Main application logic
+│       └── styles.css     # Application styles
+└── server/                # Express backend
+    ├── package.json
+    └── index.js           # Server with validation endpoint
 ```
 
-## Setup & Installation
+## Installation
 
-### Prerequisites
-- Node.js (v18 or higher recommended)
-- npm or yarn
-
-### Backend Setup
+1. Install all dependencies:
 
 ```bash
-cd backend
-npm install
-npm start
+npm run install:all
 ```
 
-The backend will run on `http://localhost:3001`
-
-### Frontend Setup
+Or install each separately:
 
 ```bash
-cd frontend
+# Root dependencies
 npm install
+
+# Server dependencies
+cd server && npm install
+
+# Client dependencies
+cd ../client && npm install
+```
+
+## Running the Application
+
+### Development Mode
+
+Start both server and client in development mode:
+
+```bash
 npm run dev
 ```
 
-The frontend will run on `http://localhost:3000`
+Or run them separately:
 
-## Usage
+```bash
+# Terminal 1 - Server (runs on port 3001)
+npm run dev:server
 
-1. **Enter Absolute Path**: Type the full path to a folder on your system (e.g., `/Users/username/Documents/my-folder`)
+# Terminal 2 - Client (runs on port 5173)
+npm run dev:client
+```
 
-2. **Select Folder**: Click "Select Folder" to open the folder picker and select the folder whose contents you want to validate
+### Access the Application
 
-3. **Review Contents**: The application will display all files and folders found in the selected directory with details
-
-4. **Submit**: Click the submit button to send the data to the backend for validation
-
-5. **View Results**: A modal will appear showing:
-   - A loading spinner while processing
-   - Success message if all items are validated
-   - Error details if validation fails
+- Frontend: http://localhost:5173
+- Backend API: http://localhost:3001
 
 ## API Endpoints
 
-### POST `/api/validate-folder`
+### POST /api/validate
 
-Validates folder contents.
+Validates that an absolute path is accessible and the folder structure matches.
 
 **Request Body:**
 ```json
 {
   "absolutePath": "/path/to/folder",
-  "folderData": [
+  "folderStructure": [
     {
       "name": "file.txt",
+      "isDirectory": false,
       "size": 1024,
-      "type": "file",
-      "lastModified": 1699999999999
+      "lastModified": "2024-01-15T10:30:00.000Z"
+    },
+    {
+      "name": "subfolder",
+      "isDirectory": true,
+      "size": 2048,
+      "lastModified": "2024-01-15T10:30:00.000Z",
+      "children": [...]
     }
   ]
 }
@@ -102,28 +116,67 @@ Validates folder contents.
 **Success Response:**
 ```json
 {
-  "success": true,
-  "message": "All items validated successfully",
-  "validatedItems": [...],
-  "totalItems": 5
+  "ok": true,
+  "message": "Validation successful! Folder structure matches."
 }
 ```
 
 **Error Response:**
 ```json
 {
-  "success": false,
-  "error": "Validation failed",
-  "details": ["Item not found: missing-file.txt"]
+  "ok": false,
+  "error": "Folder structure mismatch",
+  "details": [
+    {
+      "type": "missing_on_server",
+      "path": "file.txt",
+      "message": "File/folder \"file.txt\" exists in uploaded structure but not on server"
+    }
+  ]
 }
 ```
 
-### GET `/api/health`
+### GET /api/health
 
 Health check endpoint.
 
-## Tech Stack
+**Response:**
+```json
+{
+  "status": "ok",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
 
-- **Frontend**: React 18, Vite
-- **Backend**: Node.js, Express
-- **Styling**: Pure CSS
+## Usage
+
+1. Enter the absolute path of the folder on the server you want to validate against
+2. Click "Select Folder" to choose a local folder from your computer
+3. Review the folder preview showing all files and directories with their sizes and dates
+4. Click "Start Changes" to validate that the selected folder matches the server path
+5. View the result in the modal:
+   - ✅ Success if structures match
+   - ❌ Error with details if there's a mismatch
+
+## Technical Notes
+
+- The folder comparison checks:
+  - File and folder names
+  - Whether items are files or directories
+  - Nested folder structures
+- Size and date mismatches are not considered errors (only structure is validated)
+- The server uses `fs/promises` for async file system operations
+- The client uses the `webkitdirectory` attribute for folder selection
+
+## Browser Support
+
+The folder selection feature requires a browser that supports the `webkitdirectory` attribute:
+- Chrome 49+
+- Edge 14+
+- Firefox 50+
+- Opera 43+
+- Safari 11.1+
+
+## License
+
+MIT
